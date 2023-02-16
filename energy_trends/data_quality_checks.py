@@ -14,8 +14,6 @@ def get_data_profiling(data_csv_path):
     transposed_stats["Quarter"] = transposed_stats.index
     transposed_stats["missing_count"] = df.isna().sum().sum()
     transposed_stats["median"] = df.median(axis=0, skipna=True, numeric_only=True)
-    print(transposed_stats.head())
-    print(transposed_stats.columns)
     stats_results = transposed_stats[['Quarter', 'count', 'min', 'max', 'mean', 'median', 'std']]
     return stats_results
 
