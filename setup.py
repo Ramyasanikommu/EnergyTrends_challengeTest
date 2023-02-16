@@ -11,6 +11,7 @@ setup(
     name=NAME,
     description=DESCRIPTION,
     version='0.1.0',
+    author='Ramya Sanikommu',
     python_requires=REQUIRES_PYTHON,
     install_requires=REQUIREMENTS,
     extras_require={"dev": DEV_REQUIREMENTS},
