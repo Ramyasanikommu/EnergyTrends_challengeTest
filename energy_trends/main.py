@@ -60,8 +60,8 @@ class EnergyTrends:
         df_Quarter = pd.read_excel(excel_File_path, header=4, sheet_name="Quarter")
         df_Quarter = df_Quarter.rename(columns={'Column1': 'Product'})
         df_Quarter["Processed_at"] = datetime.datetime.now()
-        df_Quarter["FileName"]=excel_File_Path.split("/")[-1]
-        df_Quarter=df_Quarter.fillna('',inplace=True)
+        df_Quarter["FileName"]=excel_File_path.split("/")[-1]
+        #df_Quarter=df_Quarter.fillna('',inplace=true)
         print("Quarter sheet source_data is successfully parsed for: " + excel_File_path)
         return df_Quarter
 
