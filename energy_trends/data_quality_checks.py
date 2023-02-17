@@ -13,10 +13,10 @@ def GetDataProfiling(data_csv_path):
     Transposedstats = stats.T
     Transposedstats["Quarter"] = Transposedstats.index
     Transposedstats["Missingcount"] = df.isna().sum().sum()
-    Transposedstats["Median"] = df.median(axis=0, skipna=True, numeric_only=True)
+    Transposedstats["median"] = df.median(axis=0, skipna=True, numeric_only=True)
     print(Transposedstats.head())
     print(Transposedstats.columns)
-    StatsResults = Transposedstats[['Quarter', 'Count', 'Min', 'Max', 'Mean', 'Median', 'STD']]
+    StatsResults = Transposedstats[['Quarter', 'count', 'min', 'max', 'mean', 'median', 'std']]
     return StatsResults
 
 
@@ -58,7 +58,7 @@ def NewColsFromPrevious(current_report_df):
 
 def DataConsistencyChecks(data_csv_path):
     df = pd.read_csv(data_csv_path)
-    Timeformatchecks = Timeformatcheck(df, ["processed_at"])
+    Timeformatchecks = Timeformatcheck(df, ["Processed_at"])
     Record = {column + "_" + "Time_format_check": status for column, status in Timeformatchecks.items()}
     Missing_cols = MissingColsFromPrevious(df)
     if len(Missing_cols) == 0:
