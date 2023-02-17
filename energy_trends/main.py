@@ -8,99 +8,103 @@ import datetime
 BASE_PATH = Path(__file__).parent.parent
 DATA_DIR = os.path.join(BASE_PATH, "source_data")
 
-from energy_trends.data_quality_checks import get_data_profiling, data_consistency_checks
+from energy_trends.data_quality_checks import Get_Data_Profiling, Data_Consistency_Checks
 
 
 class EnergyTrends:
-    def __init__(self, web_url: str, reports_dir_path: str):
-        self.reports_dir_path = reports_dir_path
-        self.web_url = web_url
+    def __init__(self, Web_url: str, Reports_dir_path: str):
+        self.Reports_dir_path = Reports_dir_path
+        self.Web_url = Web_url
 
-    def _web_scrapper(self):
-        response = requests.get(self.web_url)
-        if response.status_code == 200:
-            web_content = response.text
-            soup = BeautifulSoup(web_content, 'html.parser')
-            return soup
+    def _Web_Scrapper(self):
+        Response = requests.get(self.Web_url)
+        if Response.status_code == 200:
+            Web_content = Response.text
+            Soup = BeautifulSoup(Web_content, 'html.parser')
+            return Soup
         else:
-            response.raise_for_status()
+            Response.raise_for_status()
 
-    def is_file_already_downloaded(self, file_name: str):
-        existing_files = []
-        for existing_file in os.listdir(DATA_DIR):
-            existing_file = existing_file.split("/")[-1]
-            if "ET_3.1" in existing_file and existing_file.endswith(".xlsx"):
-                existing_files.append(existing_file)
+    def Is_File_already_downloaded(self, File_name: str):
+         Existing_files = []
+        for Existing_file in os.listdir(DATA_DIR):
+            Existing_file = Existing_file.split("/")[-1]
+            if "ET_3.1" in Existing_file and Existing_file.endswith(".xlsx"):
+                 Existing_files.append(Existing_file)
 
-        if file_name in existing_files:
+        if File_name in  Existing_files:
             return True
         else:
             return False
 
-    def download_supply_use_data(self, file_url: str):
-        response = requests.get(file_url)
-        file_name = file_url.split("/")[-1]
-        file_path = os.path.join(DATA_DIR, file_name)
-        with open(file_path, "wb") as f:
-            f.write(response.content)
-        print("Supply & Use of crudeoil, gas and feedstocks file:" + file_name + " is successfully downloaded")
-        return file_path
+    def Download_Supply_use_data(self, file_url: str):
+        Response = requests.get(file_url)
+        File_name = file_url.split("/")[-1]
+        File_Path = os.path.join(DATA_DIR, File_name)
+        with open(File_Path, "wb") as f:
+            f.write(Response.content)
+        print("Supply & Use of crudeoil, gas and feedstocks file:" + File_name + " is successfully downloaded")
+        return File_Path
 
-    def extract_source_data_link_from_website(self):
-        # attachment_7159263 corresponds to Supply and use of crude oil, natural gas liquids, and feedstocks
-        soup = self._web_scrapper()
-        sect = soup.find("section", class_="attachment embedded", id="attachment_7159263")
-        match = sect.find(name="div")
-        file_link = match.a.get('href')
-        print("WebScrapping of the url is completed and source_data url extracted: " + file_link)
-        return file_link
+    def Extract_Source_Data_link_from_website(self):
+        # Here to extract the Supply and use of crude oil, natural gas liquids, and feedstocks related data we inspect the website link and from there 
+        #we get the attachment embedded class name with respect to the link id attachment_715963
+        Soup = self._Web_Scrapper()
+        Sect = Soup.find("section", class_="attachment embedded", id="attachment_7159263")
+        Match = Sect.find(name="div")
+        File_Link = Match.a.get('href')
+        print("WebScrapping of the url is completed and source_data url extracted: " + File_Link)
+        return File_Link
 
-    def read_supply_use_quarter_data(self, excel_file_path: str):
-        # The first 4 rows contain heading and description, the source_data header columns are in row 5
-        df_quarter = pd.read_excel(excel_file_path, header=4, sheet_name="Quarter")
-        df_quarter = df_quarter.rename(columns={'Column1': 'Product'})
-        df_quarter["processed_at"] = datetime.datetime.now()
-        df_quarter["FileName"]=excel_file_path.split("/")[-1]
-        df_quarter=df_quarter.fillna('',inplace=True)
-        print("Quarter sheet source_data is successfully parsed for: " + excel_file_path)
-        return df_quarter
+    def  Read_Supply_use_quarter_data(self, excel_File_Path: str):
+        # using the file link from the website we read the interested Quater data from the xlsx file and then analysing the data and added the processed timestamp and respected file name required.
+        Df_Quarter = pd.read_excel(excel_File_Path, header=4, sheet_name="Quarter")
+        Df_Quarter = Df_Quarter.rename(columns={'Column1': 'Product'})
+        Df_Quarter["processed_at"] = datetime.datetime.now()
+        Df_Quarter["FileName"]=excel_File_Path.split("/")[-1]
+        Df_Quarter=Df_Quarter.fillna('',inplace=True)
+        print("Quarter sheet source_data is successfully parsed for: " + excel_File_Path)
+        return Df_Quarter
 
-    def df_to_csv(self, df, file_path):
-        df.to_csv(file_path, encoding='utf-8', index=False, date_format="%Y-%m-%d %H:%M:%S")
-
-    def create_csv_reports(self, quarter_data: pd.DataFrame, file_name_prefix: str):
-        headers = [column.strip().replace(" ", "_").replace("\n", "") for column in quarter_data.columns]
-        quarter_data.columns = headers
-        timestamp_str = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-        file_name = file_name_prefix + "_" + timestamp_str + ".csv"
-        data_csv_file_path = os.path.join(self.reports_dir_path, file_name)
-        self.df_to_csv(quarter_data, data_csv_file_path)
+    def Df_to_CSV(self, df, File_Path):
+        df.to_csv(File_Path, encoding='utf-8', index=False, date_format="%Y-%m-%d %H:%M:%S")
+        
+        
+# In this section i have created the 3 kinds reports 1.Data report, 2. Data Profiling and 3. Data Consistency with the file name and respect to timestamp in the .csv fomat 
+    def Create_csv_reports(self, Quarter_Data: pd.DataFrame, File_name_prefix: str):
+        Headers = [column.strip().replace(" ", "_").replace("\n", "") for column in Quarter_Data.columns]
+        Quarter_Data.columns = Headers
+        Timestamp_Str = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        File_name = File_name_prefix + "_" + Timestamp_Str + ".csv"
+        Data_csv_File_Path = os.path.join(self.Reports_dir_path, File_name)
+        self.Df_to_CSV(quarter_data, Data_csv_File_Path)
         print("Quarter data CSV Report is created successfully")
 
-        profiling_file_name = file_name_prefix + "_data_profiling_" + timestamp_str +".csv"
-        profiling_data = get_data_profiling(data_csv_file_path)
-        self.df_to_csv(profiling_data, os.path.join(self.reports_dir_path, profiling_file_name))
+        Profiling_File_name = File_name_prefix + "_data_profiling_" + Timestamp_Str +".csv"
+        Profiling_data = Get_Data_Profiling(Data_csv_File_Path)
+        self.Df_to_CSV(Profiling_data, os.path.join(self.Reports_dir_path, Profiling_File_name))
         print("Data Profiling report is created successfully")
 
-        data_consistency_report = file_name_prefix + "_data_consistency_" + timestamp_str + ".csv"
-        data_consistency_data = data_consistency_checks(data_csv_file_path)
-        self.df_to_csv(data_consistency_data, os.path.join(self.reports_dir_path, data_consistency_report))
+        Data_consistency_report = File_name_prefix + "_data_consistency_" + Timestamp_Str + ".csv"
+        Data_consistency_data = Data_Consistency_Checks(Data_csv_File_Path)
+        self.Df_to_CSV(Data_consistency_data, os.path.join(self.Reports_dir_path, Data_consistency_report))
         print("Data Consistency report is created successfully")
 
     def run(self):
-        supply_use_file_link = self.extract_source_data_link_from_website()
-        latest_file_name = supply_use_file_link.split("/")[-1]
-        if self.is_file_already_downloaded(latest_file_name) is False:
-            latest_file_path = self.download_supply_use_data(supply_use_file_link)
-            quarter_data = self.read_supply_use_quarter_data(latest_file_path)
-            self.create_csv_reports(quarter_data, latest_file_name.replace(".xlsx", ""))
+        # This is the main method which triggers the whole process and also checks where the file was downloaded or not if yes it will print already file was downloaded else it will print all the 3 types of reports. 
+        Supply_use_file_link = self.Extract_Source_Data_link_from_website()
+        Latest_File_name = Supply_use_file_link.split("/")[-1]
+        if self. Is_File_already_downloaded(Latest_File_name) is False:
+            Latest_File_Path = self.Download_Supply_use_data(Supply_use_file_link)
+            Quarter_Data = self. Read_Supply_use_quarter_data(Latest_File_Path)
+            self.Create_csv_reports(quarter_data, Latest_File_name.replace(".xlsx", ""))
         else:
-            print("The file: " + latest_file_name + " is already downloaded earlier and hence aborting processing")
+            print("The file: " + Latest_File_name + " is already downloaded earlier and hence aborting processing")
 
 
 if __name__ == '__main__':
-    web_url = "https://www.gov.uk/government/statistics/oil-and-oil-products-section-3-energy-trends"
-    reports_dir = os.path.join(BASE_PATH, "reports")
-    energy_trends = EnergyTrends(web_url, reports_dir)
-    energy_trends.run()
+    Web_url = "https://www.gov.uk/government/statistics/oil-and-oil-products-section-3-energy-trends"
+    Reports_dir = os.path.join(BASE_PATH, "reports")
+    Energy_trends = EnergyTrends(Web_url, Reports_dir)
+    Energy_trends.run()
 
