@@ -1,1 +1,2 @@
-This is the Python Application which extracts the UK government's website and extracts the data from "Supply and use of crude oil, natural gas liquids, and feedstocks" dataset and stores the data, cleaning the data and also analysing the data.
+This is the Python Application which extracts the UK government's website and extracts the data from "Supply and use of crude oil, natural gas liquids, and feedstocks" dataset and stores the data, cleaning the data and also analyses and creates csv reports for the quarters data and data profiling and data consistency checks. The source data and reports are available. Then the source data downloaded from the website is stored in folder name and final reports are created in folder name.
+
